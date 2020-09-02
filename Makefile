@@ -16,3 +16,8 @@ $(ROM_SRC): rom
 .PHONY: rom
 rom:
 	@-cd $(ROM_PATH) && python3 build-roms.py
+
+clean: myclean
+
+myclean:
+	-rm -rf ./nes/gen
