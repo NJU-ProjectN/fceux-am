@@ -21,6 +21,7 @@
 /// \file
 /// \brief Handles sound emulation using the SDL.
 
+#include <klib-macros.h>
 #include "sdl.h"
 #include "../../config.h"
 
@@ -53,17 +54,14 @@ InitSound()
 
 #if SOUND_CONFIG != SOUND_NONE
   const int soundbufsize = 128;
-  _DEV_AUDIO_INIT_t init;
-  init.freq = soundrate;
-  init.channels = 1;
-  init.samples = 512;
-  init.bufsize = soundbufsize * soundrate / 1000;
-  if (init.bufsize < init.samples * 2) {
-    init.bufsize = init.samples * 2;
+  int samples = 512;
+  int bufsize = soundbufsize * soundrate / 1000;
+  if (bufsize < samples * 2) {
+    bufsize = samples * 2;
   }
-  s_BufferSize = init.bufsize;
-  init.bufsize *= sizeof(int16_t);
-  _io_write(_DEV_AUDIO, _DEVREG_AUDIO_INIT, &init, sizeof(init));
+  s_BufferSize = bufsize;
+  bufsize *= sizeof(int16_t);
+  io_write(AM_AUDIO_CONFIG, true, soundrate, 1, samples, bufsize);
 #endif
 
   FCEUI_SetSoundVolume(soundvolume);
@@ -94,10 +92,8 @@ GetMaxSound(void)
 GetWriteSound(void)
 {
 #if SOUND_CONFIG != SOUND_NONE
-  _DEV_AUDIO_SBSTAT_t audio;
-  _io_read(_DEV_AUDIO, _DEVREG_AUDIO_SBSTAT, &audio, sizeof(audio));
-  audio.count /= sizeof(int16_t);
-  return s_BufferSize - audio.count;
+  int count = io_read(AM_AUDIO_STATUS).count / sizeof(int16_t);
+  return s_BufferSize - count;
 #else
   return 0;
 #endif
@@ -124,11 +120,10 @@ WriteSound(int32 *buf,
       buf16[i] = buf[i];
     }
 
-    _DEV_AUDIO_SBCTRL_t audio;
-    audio.stream = (uint8_t *)buf16;
-    audio.wait = 1;
-    audio.len = Count * sizeof(buf16[0]);
-    _io_write(_DEV_AUDIO, _DEVREG_AUDIO_SBCTRL, &audio, sizeof(audio));
+    Area sbuf;
+    sbuf.start = buf16;
+    sbuf.end = (uint8_t *)sbuf.start + Count * sizeof(buf16[0]);
+    io_write(AM_AUDIO_PLAY, sbuf);
     free(buf16);
   }
 #endif
