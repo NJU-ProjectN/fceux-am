@@ -107,14 +107,14 @@ WriteSound(int32 *buf,
     int Count)
 {
 #if SOUND_CONFIG != SOUND_NONE
+  static int16_t buf16[2048+512] = {};
   extern int EmulationPaused;
   if (EmulationPaused == 0) {
     // FECUX stores each PCM sample as 32-bit data,
     // but it sets the audio type with AUDIO_S16SYS,
     // so we should transform the `buf` into a 16-bit
     // buffer before feeding it to the audio device
-    int16_t *buf16 = (int16_t *)malloc(sizeof(buf16[0]) * Count);
-    assert(buf16);
+    assert(Count < (int)LENGTH(buf16));
     int i;
     for (i = 0; i < Count; i ++) {
       buf16[i] = buf[i];
@@ -124,7 +124,6 @@ WriteSound(int32 *buf,
     sbuf.start = buf16;
     sbuf.end = (uint8_t *)sbuf.start + Count * sizeof(buf16[0]);
     io_write(AM_AUDIO_PLAY, sbuf);
-    free(buf16);
   }
 #endif
 }
