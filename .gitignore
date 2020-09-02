@@ -1,0 +1,17 @@
+*
+!*/
+!*.h
+!*.c
+!*.cpp
+!*.py
+!Makefile
+!README*
+!LICENSE
+.*
+_*
+*~
+build/
+nes/gen/
+nes/rom/
+!nes/rom/README.md
+!.gitignore
