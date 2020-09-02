@@ -22,7 +22,6 @@
 /// \brief Handles sound emulation using the SDL.
 
 #include "sdl.h"
-#include <amdev.h>
 #include "../../config.h"
 
 // unit: 16-bit

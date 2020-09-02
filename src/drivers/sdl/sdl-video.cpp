@@ -18,8 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#define HAS_GUI
-
+#include <klib-macros.h>
 #include "sdl.h"
 #include "../common/vidblit.h"
 #include "../../fceu.h"
@@ -32,6 +31,7 @@
 #include "dface.h"
 
 #include "sdl-video.h"
+#include "../../config.h"
 
 static int s_srendline, s_erendline;
 static int s_tlines;
@@ -135,8 +135,9 @@ BlitScreen(uint8 *XBuf)
 
   // ensure that the display is updated
 #ifdef HAS_GUI
-  draw_rect(canvas, (screen_width() - 256) / 2, (screen_height() - 240) / 2, scrw, s_tlines);
-  draw_sync();
+  int x = (io_read(AM_GPU_CONFIG).width - 256) / 2;
+  int y = (io_read(AM_GPU_CONFIG).height - 240) / 2;
+  io_write(AM_GPU_FBDRAW, x, y, canvas, scrw, s_tlines, true);
 #else
   printf("\033[0;0H");
   for (int y = 0; y < s_tlines; y += 4) {
@@ -145,9 +146,9 @@ BlitScreen(uint8 *XBuf)
       uint32_t color = canvas[y * 256 + x];
       const char *list = "o. *O0@#";
       char c = list[color / 0x222222u];
-      _putc(c);
+      putch(c);
     }
-    _putc('\n');
+    putch('\n');
   }
 #endif
 }

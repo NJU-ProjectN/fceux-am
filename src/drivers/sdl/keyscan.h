@@ -1,4 +1,4 @@
-#include <amdev.h>
+#include <am.h>
 
-#define MKK(k) _KEY_##k
+#define MKK(k) AM_KEY_##k
 #define MKK_COUNT 256

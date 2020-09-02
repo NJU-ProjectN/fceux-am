@@ -1,3 +1,4 @@
+#include <klib-macros.h>
 #include "main.h"
 #include "throttle.h"
 
@@ -261,7 +262,7 @@ int main(const char *romname)
 int main(int argc, char *argv[])
 #endif
 {
-  _ioe_init();
+  ioe_init();
 
 #ifndef __NO_FILE_SYSTEM__
   const char *romname;
@@ -324,7 +325,7 @@ int main(int argc, char *argv[])
 uint64
 FCEUD_GetTime()
 {
-	return uptime();
+	return io_read(AM_TIMER_UPTIME).us / 1000;
 }
 
 /**

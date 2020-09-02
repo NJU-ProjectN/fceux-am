@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <klib-macros.h>
 #include "main.h"
 #include "dface.h"
 #include "input.h"
@@ -105,13 +106,12 @@ static void KeyboardCommands ()
   int keycode;
   do {
 #define KEYDOWN_MASK 0x8000
-    int key = read_key();
-    keycode = key & ~KEYDOWN_MASK;
-    int keydown = (key & KEYDOWN_MASK) != 0;
-    assert(keycode < 256);
-    g_keyState[keycode] = keydown;
-    if (keycode == _KEY_ESCAPE || keycode == _KEY_Q) _halt(0);
-  } while (keycode != _KEY_NONE);
+    AM_INPUT_KEYBRD_T ev = io_read(AM_INPUT_KEYBRD);
+    assert(ev.keycode < 256);
+    keycode = ev.keycode;
+    g_keyState[keycode] = ev.keydown;
+    if (keycode == AM_KEY_ESCAPE || keycode == AM_KEY_Q) halt(0);
+  } while (keycode != AM_KEY_NONE);
 
 	// Toggle throttling
 	NoWaiting &= ~1;
@@ -299,8 +299,8 @@ const char *GamePadNames[GAMEPAD_NUM_BUTTONS] = { "A", "B", "Select", "Start",
 const char *DefaultGamePadDevice[GAMEPAD_NUM_DEVICES] =
 { "Keyboard", "None", "None", "None" };
 const int DefaultGamePad[GAMEPAD_NUM_DEVICES][GAMEPAD_NUM_BUTTONS] =
-{ {_KEY_J, _KEY_K, _KEY_U, _KEY_I,
-	_KEY_W, _KEY_S, _KEY_A, _KEY_D, 0, 0},
+{ {AM_KEY_J, AM_KEY_K, AM_KEY_U, AM_KEY_I,
+	AM_KEY_W, AM_KEY_S, AM_KEY_A, AM_KEY_D, 0, 0},
 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
