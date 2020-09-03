@@ -115,7 +115,8 @@ void ShowFPS(void)
 
 	if (now - tsc > 1000) {
 		tsc = now;
-  	printf("fps = %d\n", booplimit * FCEUD_GetTimeFreq() / da);
+		for (int i = 0; i < 40; i ++) putch('\b');
+		printf("(System time: %ds) FPS = %d", now / 1000, booplimit * FCEUD_GetTimeFreq() / da);
 	}
 	// It's not averaging FPS over exactly 1 second, but it's close enough.
 	boopcount = (boopcount + 1) % booplimit;
