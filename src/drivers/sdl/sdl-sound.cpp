@@ -53,6 +53,11 @@ InitSound()
   const int soundpcmvolume = 256;
 
 #if SOUND_CONFIG != SOUND_NONE
+  if (!io_read(AM_AUDIO_CONFIG).present) {
+    printf("WARNING: %s does not support audio\n", TOSTRING(__ARCH__));
+    return 1;
+  }
+
   const int soundbufsize = 128;
   int samples = 512;
   int bufsize = soundbufsize * soundrate / 1000;
@@ -61,7 +66,7 @@ InitSound()
   }
   s_BufferSize = bufsize;
   bufsize *= sizeof(int16_t);
-  io_write(AM_AUDIO_CONFIG, true, soundrate, 1, samples, bufsize);
+  io_write(AM_AUDIO_CTRL, soundrate, 1, samples, bufsize);
 #endif
 
   FCEUI_SetSoundVolume(soundvolume);
