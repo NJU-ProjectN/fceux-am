@@ -2,6 +2,7 @@
 !*/
 !*.h
 !*.c
+!*.inc
 !*.cpp
 !*.py
 !Makefile
