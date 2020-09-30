@@ -26,7 +26,7 @@
 #include "../../config.h"
 
 // unit: 16-bit
-static unsigned int s_BufferSize;
+static int s_BufferSize;
 
 /**
  * Initialize the audio subsystem.
@@ -60,13 +60,11 @@ InitSound()
 
   const int soundbufsize = 128;
   int samples = 512;
-  int bufsize = soundbufsize * soundrate / 1000;
-  if (bufsize < samples * 2) {
-    bufsize = samples * 2;
+  s_BufferSize = soundbufsize * soundrate / 1000;
+  if (s_BufferSize < samples * 2) {
+    s_BufferSize = samples * 2;
   }
-  s_BufferSize = bufsize;
-  bufsize *= sizeof(int16_t);
-  io_write(AM_AUDIO_CTRL, soundrate, 1, samples, bufsize);
+  io_write(AM_AUDIO_CTRL, soundrate, 1, samples);
 #endif
 
   FCEUI_SetSoundVolume(soundvolume);
@@ -127,8 +125,15 @@ WriteSound(int32 *buf,
 
     Area sbuf;
     sbuf.start = buf16;
-    sbuf.end = (uint8_t *)sbuf.start + Count * sizeof(buf16[0]);
-    io_write(AM_AUDIO_PLAY, sbuf);
+    int free;
+    while (Count) {
+      while ((free = GetWriteSound()) == 0);  // wait until there is free space
+      int nrplay = (free > Count ? Count : free);
+      sbuf.end = (uint16_t *)sbuf.start + nrplay;
+      io_write(AM_AUDIO_PLAY, sbuf);
+      Count -= nrplay;
+      sbuf.start = sbuf.end;
+    }
   }
 #endif
 }
