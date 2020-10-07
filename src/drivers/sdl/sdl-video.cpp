@@ -33,8 +33,9 @@
 #include "sdl-video.h"
 #include "../../config.h"
 
-static int s_srendline, s_erendline;
-static int s_tlines;
+static int s_srendline;
+//static int s_erendline;
+static const int s_tlines = 240;
 static int s_inited;
 
 #define s_clipSides 0
@@ -75,8 +76,8 @@ InitVideo(FCEUGI *gi)
 	FCEUI_printf("Initializing video...");
 
 	// check the starting, ending, and total scan lines
-	FCEUI_GetCurrentVidSystem(&s_srendline, &s_erendline);
-	s_tlines = s_erendline - s_srendline + 1;
+	//FCEUI_GetCurrentVidSystem(&s_srendline, &s_erendline);
+	//s_tlines = s_erendline - s_srendline + 1;
 
 	s_inited = 1;
 
