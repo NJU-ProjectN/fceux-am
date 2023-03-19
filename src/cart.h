@@ -28,8 +28,6 @@ typedef struct {
 					// other code in the future.
 } CartInfo;
 
-extern CartInfo *currCartInfo;
-
 void FCEU_SaveGameSave(CartInfo *LocalHWInfo);
 void FCEU_LoadGameSave(CartInfo *LocalHWInfo);
 void FCEU_ClearGameSave(CartInfo *LocalHWInfo);
@@ -95,8 +93,6 @@ void setntamem(uint8 *p, int ram, uint32 b);
 #define MI_V 1
 #define MI_0 2
 #define MI_1 3
-
-extern int geniestage;
 
 void FCEU_GeniePower(void);
 

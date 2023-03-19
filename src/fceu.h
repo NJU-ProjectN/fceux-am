@@ -28,9 +28,6 @@ void SetWriteHandler(int32 start, int32 end, writefunc func);
 writefunc GetWriteHandler(int32 a);
 readfunc GetReadHandler(int32 a);
 
-int AllocGenieRW(void);
-void FlushGenieRW(void);
-
 void FCEU_ResetVidSys(void);
 
 void ResetMapping(void);

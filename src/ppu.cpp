@@ -1361,7 +1361,7 @@ static void FetchSpriteData(void) {
 					}
 
 					/* Fix this geniestage hack */
-					if (MMC5Hack && geniestage != 1)
+					if (MMC5Hack)
 						C = MMC5SPRVRAMADR(vadr);
 					else
 						C = VRAMADR(vadr);

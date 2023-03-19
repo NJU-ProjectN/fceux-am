@@ -61,17 +61,6 @@ uint32 CHRmask2[32];
 uint32 CHRmask4[32];
 uint32 CHRmask8[32];
 
-int geniestage = 0;
-
-int modcon;
-
-uint8 genieval[3];
-uint8 geniech[3];
-
-uint32 genieaddr[3];
-
-CartInfo *currCartInfo;
-
 static INLINE void setpageptr(int s, uint32 A, uint8 *p, int ram) {
 	uint32 AB = A >> 11;
 	int x;
@@ -335,8 +324,6 @@ void SetupCartMirroring(int m, int hard, uint8 *extra) {
 /* Called when a game is closed. */
 void FCEU_CloseGenie(void) {
 	/* No good reason to free() the Game Genie ROM image data. */
-	geniestage = 0;
-	FlushGenieRW();
 	VPageR = VPage;
 }
 

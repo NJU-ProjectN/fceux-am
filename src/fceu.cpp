@@ -118,9 +118,6 @@ void (*GameStateRestore)(int version);
 
 readfunc ARead[0x10000];
 writefunc BWrite[0x10000];
-static readfunc *AReadG;
-static writefunc *BWriteG;
-static int RWWrap = 0;
 
 //mbg merge 7/18/06 docs
 //bit0 indicates whether emulation is paused
@@ -143,36 +140,8 @@ static DECLFR(ANull) {
 	return(X.DB);
 }
 
-int AllocGenieRW(void) {
-	if (!(AReadG = (readfunc*)FCEU_malloc(0x8000 * sizeof(readfunc))))
-		return 0;
-	if (!(BWriteG = (writefunc*)FCEU_malloc(0x8000 * sizeof(writefunc))))
-		return 0;
-	RWWrap = 1;
-	return 1;
-}
-
-void FlushGenieRW(void) {
-	int32 x;
-
-	if (RWWrap) {
-		for (x = 0; x < 0x8000; x++) {
-			ARead[x + 0x8000] = AReadG[x];
-			BWrite[x + 0x8000] = BWriteG[x];
-		}
-		free(AReadG);
-		free(BWriteG);
-		AReadG = NULL;
-		BWriteG = NULL;
-		RWWrap = 0;
-	}
-}
-
 readfunc GetReadHandler(int32 a) {
-	if (a >= 0x8000 && RWWrap)
-		return AReadG[a - 0x8000];
-	else
-		return ARead[a];
+  return ARead[a];
 }
 
 void SetReadHandler(int32 start, int32 end, readfunc func) {
@@ -181,23 +150,12 @@ void SetReadHandler(int32 start, int32 end, readfunc func) {
 	if (!func)
 		func = ANull;
 
-	if (RWWrap)
-		for (x = end; x >= start; x--) {
-			if (x >= 0x8000)
-				AReadG[x - 0x8000] = func;
-			else
-				ARead[x] = func;
-		}
-	else
-		for (x = end; x >= start; x--)
-			ARead[x] = func;
+  for (x = end; x >= start; x--)
+    ARead[x] = func;
 }
 
 writefunc GetWriteHandler(int32 a) {
-	if (RWWrap && a >= 0x8000)
-		return BWriteG[a - 0x8000];
-	else
-		return BWrite[a];
+  return BWrite[a];
 }
 
 void SetWriteHandler(int32 start, int32 end, writefunc func) {
@@ -206,16 +164,8 @@ void SetWriteHandler(int32 start, int32 end, writefunc func) {
 	if (!func)
 		func = BNull;
 
-	if (RWWrap)
-		for (x = end; x >= start; x--) {
-			if (x >= 0x8000)
-				BWriteG[x - 0x8000] = func;
-			else
-				BWrite[x] = func;
-		}
-	else
-		for (x = end; x >= start; x--)
-			BWrite[x] = func;
+  for (x = end; x >= start; x--)
+    BWrite[x] = func;
 }
 
 uint8 RAM[0x800];
