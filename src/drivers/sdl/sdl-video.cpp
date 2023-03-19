@@ -38,10 +38,7 @@ static int s_srendline;
 static const int s_tlines = 240;
 static int s_inited;
 
-#define s_clipSides 0
-
-#define NWIDTH	(256 - (s_clipSides ? 16 : 0))
-#define NOFFSET	(s_clipSides ? 8 : 0)
+#define NWIDTH	256
 
 static int s_paletterefresh;
 
@@ -110,8 +107,6 @@ FCEUD_SetPalette(uint8 index,
 	s_paletterefresh = 1;
 }
 
-static uint32_t canvas[NWIDTH * 240];
-
 /**
  * Pushes the given buffer of bits to the screen.
  */
@@ -129,22 +124,25 @@ BlitScreen(uint8 *XBuf)
 
 	// XXX soules - again, I'm surprised SDL can't handle this
 	// perform the blit, converting bpp if necessary
-  Blit8ToHigh(XBuf + NOFFSET, (uint8 *)canvas, NWIDTH, s_tlines, NWIDTH * 4, 1, 1);
+  //Blit8ToHigh(XBuf, (uint8 *)canvas, NWIDTH, s_tlines, NWIDTH * 4, 1, 1);
 
-	int scrw = NWIDTH;
-
-
-  // ensure that the display is updated
+  static uint32_t canvas_line[NWIDTH];
+  int i;
 #ifdef HAS_GUI
   int x = (io_read(AM_GPU_CONFIG).width - 256) / 2;
   int y = (io_read(AM_GPU_CONFIG).height - 240) / 2;
-  io_write(AM_GPU_FBDRAW, x, y, canvas, scrw, s_tlines, true);
+  for (i = 0; i < s_tlines; i ++, XBuf += NWIDTH) {
+    Blit8ToHigh(XBuf, (uint8 *)canvas_line, NWIDTH, 1, NWIDTH * 4, 1, 1);
+    io_write(AM_GPU_FBDRAW, x, y, canvas_line, NWIDTH, 1, false);
+    y ++;
+  }
+  io_write(AM_GPU_FBDRAW, 0, 0, NULL, 0, 0, true);
 #else
   printf("\033[0;0H");
-  for (int y = 0; y < s_tlines; y += 4) {
-    //draw_rect(&screen[y][8], xpad, ypad + y, W, 1);
-    for (int x = 0; x < scrw; x += 2) {
-      uint32_t color = canvas[y * 256 + x];
+  for (i = 0; i < s_tlines; i += 4, XBuf += NWIDTH * 4) {
+    Blit8ToHigh(XBuf, (uint8 *)canvas_line, NWIDTH, 1, NWIDTH * 4, 1, 1);
+    for (int x = 0; x < NWIDTH; x += 2) {
+      uint32_t color = canvas_line[x];
       const char *list = "o. *O0@#";
       char c = list[color / 0x222222u];
       putch(c);
