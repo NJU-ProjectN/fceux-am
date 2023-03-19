@@ -2081,9 +2081,9 @@ int FCEUX_PPU_Loop(int skip) {
 					int xstart = xt << 3;
 					oamcount = oamcounts[renderslot];
 					uint8 * const target = XBuf + (yp << 8) + xstart;
-					uint8 * const dtarget = XDBuf + (yp << 8) + xstart;
+					//uint8 * const dtarget = XDBuf + (yp << 8) + xstart;
 					uint8 *ptr = target;
-					uint8 *dptr = dtarget;
+					//uint8 *dptr = dtarget;
 					int rasterpos = xstart;
 
 					//check all the conditions that can cause things to render in these 8px
@@ -2167,7 +2167,7 @@ int FCEUX_PPU_Loop(int skip) {
 						}
 
 						*ptr++ = PaletteAdjustPixel(pixelcolor);
-						*dptr++= PPU[1]>>5; //grab deemph
+						//*dptr++= PPU[1]>>5; //grab deemph
 					}
 				}
 			}

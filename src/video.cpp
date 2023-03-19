@@ -36,9 +36,9 @@
 //128-195 is the palette with no emphasis
 //196-255 is the palette with all emphasis bits on
 u8 *XBuf=NULL; //used for current display
-u8 *XBackBuf=NULL; //ppu output is stashed here before drawing happens
-u8 *XDBuf=NULL; //corresponding to XBuf but with deemph bits
-u8 *XDBackBuf=NULL; //corresponding to XBackBuf but with deemph bits
+//u8 *XBackBuf=NULL; //ppu output is stashed here before drawing happens
+//u8 *XDBuf=NULL; //corresponding to XBuf but with deemph bits
+//u8 *XDBackBuf=NULL; //corresponding to XBackBuf but with deemph bits
 int ClipSidesOffset=0;	//Used to move displayed messages when Clips left and right sides is checked
 static u8 *xbsave=NULL;
 
@@ -59,10 +59,11 @@ int FCEU_InitVirtualVideo(void)
 		return 1;
 
 	XBuf = (u8*)FCEU_malloc(256 * 256 + 16);
-	XBackBuf = (u8*)FCEU_malloc(256 * 256 + 16);
-	XDBuf = (u8*)FCEU_malloc(256 * 256 + 16);
-	XDBackBuf = (u8*)FCEU_malloc(256 * 256 + 16);
-	if(!XBuf || !XBackBuf || !XDBuf || !XDBackBuf)
+	//XBackBuf = (u8*)FCEU_malloc(256 * 256 + 16);
+	//XDBuf = (u8*)FCEU_malloc(256 * 256 + 16);
+	//XDBackBuf = (u8*)FCEU_malloc(256 * 256 + 16);
+	if(!XBuf)
+	//if(!XBuf || !XBackBuf || !XDBuf || !XDBackBuf)
 	{
 		return 0;
 	}
@@ -77,9 +78,7 @@ int FCEU_InitVirtualVideo(void)
 	}
 
 	memset(XBuf,128,256*256);
-	memset(XBackBuf,128,256*256);
-	memset(XBuf,128,256*256);
-	memset(XBackBuf,128,256*256);
+	//memset(XBackBuf,128,256*256);
 
 	return 1;
 }

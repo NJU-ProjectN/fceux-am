@@ -24,7 +24,7 @@
 #include "../../utils/memory.h"
 
 extern u8 *XBuf;
-extern u8 *XDBuf;
+//extern u8 *XDBuf;
 extern pal *palo;
 
 static uint32 CBM[3];
@@ -110,31 +110,6 @@ void SetPaletteBlitToHigh(uint8 *src)
 				palettetranslate[256+x]=(r<<cshiftl[0])|(g<<cshiftl[1])|(b<<cshiftl[2]);
 			}
 		}
-}
-
-//takes a pointer to XBuf and applies fully modern deemph palettizing
-u32 ModernDeemphColorMap(u8* src, u8* srcbuf, int xscale, int yscale)
-{
-	u8 pixel = *src;
-
-	//look up the legacy translation
-	u32 color = palettetranslate[pixel];
-
-	int ofs = src-srcbuf;
-	int xofs = ofs&255;
-	int yofs = ofs>>8;
-	if(xscale!=1) xofs /= xscale; //untested optimization
-	if(yscale!=1) yofs /= yscale; //untested optimization
-	ofs = xofs+yofs*256;
-
-	//find out which deemph bitplane value we're on
-	uint8 deemph = XDBuf[ofs];
-
-	//if it was a deemph'd value, grab it from the deemph palette
-	if(deemph != 0)
-		color = palettetranslate[256+(pixel&0x3F)+deemph*64];
-
-	return color;
 }
 
 void Blit8ToHigh(uint8 *src, uint8 *dest, int xr, int yr, int pitch, int xscale, int yscale)

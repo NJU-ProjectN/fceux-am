@@ -484,7 +484,8 @@ void FCEUI_Emulate(uint8 **pXBuf, int32 **SoundBuf, int32 *SoundBufSize, int ski
 		if (EmulationPaused & EMULATIONPAUSED_PAUSED)
 		{
 			// emulator is paused
-			memcpy(XBuf, XBackBuf, 256*256);
+			//memcpy(XBuf, XBackBuf, 256*256);
+			memset(XBuf, 0, 256*256);
 			*pXBuf = XBuf;
       *SoundBuf = WaveFinal;
       *SoundBufSize = 0;
@@ -531,8 +532,8 @@ void ResetNES(void) {
 	X6502_Reset();
 
 	// clear back baffer
-	extern uint8 *XBackBuf;
-	memset(XBackBuf, 0, 256 * 256);
+	//extern uint8 *XBackBuf;
+	//memset(XBackBuf, 0, 256 * 256);
 
 	FCEU_DispMessage("Reset");
 }
@@ -573,8 +574,8 @@ void PowerNES(void) {
 	timestampbase = 0;
 	X6502_Power();
 	// clear back buffer
-	extern uint8 *XBackBuf;
-	memset(XBackBuf, 0, 256 * 256);
+	//extern uint8 *XBackBuf;
+	//memset(XBackBuf, 0, 256 * 256);
 
 	FCEU_DispMessage("Power on");
 }
