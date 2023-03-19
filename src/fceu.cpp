@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "config.h"
 #include "types.h"
 #include "x6502.h"
 #include "fceu.h"
@@ -116,8 +117,24 @@ FCEUGI *GameInfo = NULL;
 void (*GameInterface)(GI h);
 void (*GameStateRestore)(int version);
 
+#ifdef SIZE_OPT
+#define FUNC_IDX_MAX16
+
+#ifdef FUNC_IDX_MAX16
+#define FUNC_IDX_MAX 16
+static uint8 AReadIdx[0x10000 / 2];
+static uint8 BWriteIdx[0x10000 / 2];
+#else
+#define FUNC_IDX_MAX 256
+static uint8 AReadIdx[0x10000];
+static uint8 BWriteIdx[0x10000];
+#endif
+static readfunc ARead[FUNC_IDX_MAX];
+static writefunc BWrite[FUNC_IDX_MAX];
+#else
 static readfunc ARead[0x10000];
 static writefunc BWrite[0x10000];
+#endif
 
 //mbg merge 7/18/06 docs
 //bit0 indicates whether emulation is paused
@@ -140,14 +157,71 @@ static DECLFR(ANull) {
 	return(X.DB);
 }
 
+#ifdef SIZE_OPT
+static int RegisterARead(readfunc func) {
+  int i;
+  for (i = 0; i < FUNC_IDX_MAX; i ++) {
+    if (ARead[i] == NULL) ARead[i] = func;
+    if (ARead[i] == func) return i;
+  }
+  assert(i < FUNC_IDX_MAX);
+  return -1;
+}
+
+static int RegisterBWrite(writefunc func) {
+  int i;
+  for (i = 0; i < FUNC_IDX_MAX; i ++) {
+    if (BWrite[i] == NULL) BWrite[i] = func;
+    if (BWrite[i] == func) return i;
+  }
+  assert(i < FUNC_IDX_MAX);
+  return -1;
+}
+
+static uint8 GetIdx(uint8 *array, uint32 addr) {
+#ifdef FUNC_IDX_MAX16
+  uint8 i = array[addr >> 1];
+  if (addr & 1) i >>= 4;
+  else i &= 0xf;
+#else
+  uint8 i = array[addr];
+#endif
+  assert(i < FUNC_IDX_MAX);
+  return i;
+}
+
+static void SetIdx(uint8 *array, uint32 addr, uint8 i) {
+  assert(i < FUNC_IDX_MAX);
+#ifdef FUNC_IDX_MAX16
+  uint8 mask = 0xf;
+  if (addr & 1) {
+    mask <<= 4;
+    i <<= 4;
+  }
+  array[addr >> 1] &= ~mask;
+  array[addr >> 1] |= i;
+#else
+  array[addr] = i;
+#endif
+}
+#endif
+
 readfunc GetReadHandler(int32 a) {
+#ifdef SIZE_OPT
+  return ARead[GetIdx(AReadIdx, a)];
+#else
   return ARead[a];
+#endif
 }
 
 void SetOneReadHandler(int32 addr, readfunc func) {
   if (!func)
     func = ANull;
+#ifdef SIZE_OPT
+  SetIdx(AReadIdx, addr, RegisterARead(func));
+#else
   ARead[addr] = func;
+#endif
 }
 
 void SetReadHandler(int32 start, int32 end, readfunc func) {
@@ -156,18 +230,32 @@ void SetReadHandler(int32 start, int32 end, readfunc func) {
 	if (!func)
 		func = ANull;
 
+#ifdef SIZE_OPT
+  int idx = RegisterARead(func);
+  for (x = end; x >= start; x--)
+    SetIdx(AReadIdx, x, idx);
+#else
   for (x = end; x >= start; x--)
     ARead[x] = func;
+#endif
 }
 
 writefunc GetWriteHandler(int32 a) {
+#ifdef SIZE_OPT
+  return BWrite[GetIdx(BWriteIdx, a)];
+#else
   return BWrite[a];
+#endif
 }
 
 void SetOneWriteHandler(int32 addr, writefunc func) {
   if (!func)
     func = BNull;
+#ifdef SIZE_OPT
+  SetIdx(BWriteIdx, addr, RegisterBWrite(func));
+#else
   BWrite[addr] = func;
+#endif
 }
 
 void SetWriteHandler(int32 start, int32 end, writefunc func) {
@@ -176,8 +264,14 @@ void SetWriteHandler(int32 start, int32 end, writefunc func) {
 	if (!func)
 		func = BNull;
 
+#ifdef SIZE_OPT
+  int idx = RegisterBWrite(func);
+  for (x = end; x >= start; x--)
+    SetIdx(BWriteIdx, x, idx);
+#else
   for (x = end; x >= start; x--)
     BWrite[x] = func;
+#endif
 }
 
 uint8 readb(int32 a) {
