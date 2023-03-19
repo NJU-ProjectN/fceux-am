@@ -98,8 +98,8 @@ static DECLFR(UNLSB2000Read) {
 static DECLFW(UNLSB2000Write) {
 	switch(A) {
 	case 0x4027:	// PCM output
-		BWrite[0x4015](0x4015, 0x10);
-		BWrite[0x4011](0x4011, V >> 1);
+		writeb(0x4015, 0x10);
+		writeb(0x4011, V >> 1);
 		break;
 	case 0x4032:	// IRQ mask
 		IRQa &= ~V;

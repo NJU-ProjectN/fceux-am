@@ -116,8 +116,8 @@ FCEUGI *GameInfo = NULL;
 void (*GameInterface)(GI h);
 void (*GameStateRestore)(int version);
 
-readfunc ARead[0x10000];
-writefunc BWrite[0x10000];
+static readfunc ARead[0x10000];
+static writefunc BWrite[0x10000];
 
 //mbg merge 7/18/06 docs
 //bit0 indicates whether emulation is paused
@@ -144,6 +144,12 @@ readfunc GetReadHandler(int32 a) {
   return ARead[a];
 }
 
+void SetOneReadHandler(int32 addr, readfunc func) {
+  if (!func)
+    func = ANull;
+  ARead[addr] = func;
+}
+
 void SetReadHandler(int32 start, int32 end, readfunc func) {
 	int32 x;
 
@@ -158,6 +164,12 @@ writefunc GetWriteHandler(int32 a) {
   return BWrite[a];
 }
 
+void SetOneWriteHandler(int32 addr, writefunc func) {
+  if (!func)
+    func = BNull;
+  BWrite[addr] = func;
+}
+
 void SetWriteHandler(int32 start, int32 end, writefunc func) {
 	int32 x;
 
@@ -166,6 +178,14 @@ void SetWriteHandler(int32 start, int32 end, writefunc func) {
 
   for (x = end; x >= start; x--)
     BWrite[x] = func;
+}
+
+uint8 readb(int32 a) {
+  return GetReadHandler(a)(a);
+}
+
+void writeb(int32 a, uint8 v) {
+  GetWriteHandler(a)(a, v);
 }
 
 uint8 RAM[0x800];
