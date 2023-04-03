@@ -162,6 +162,7 @@ static void DoSQV2(void);
 static void DoSawV(void);
 
 static INLINE void DoSQV(int x) {
+#if SOUND_CONFIG != SOUND_NONE
 	int32 V;
 	int32 amp = (((vpsg1[x << 2] & 15) << 8) * 6 / 8) >> 4;
 	int32 start, end;
@@ -189,6 +190,7 @@ static INLINE void DoSQV(int x) {
 			}
 		}
 	}
+#endif
 }
 
 static void DoSQV1(void) {
@@ -200,6 +202,7 @@ static void DoSQV2(void) {
 }
 
 static void DoSawV(void) {
+#if SOUND_CONFIG != SOUND_NONE
 	int V;
 	int32 start, end;
 
@@ -238,9 +241,11 @@ static void DoSawV(void) {
 			Wave[V >> 4] += duff;
 		}
 	}
+#endif
 }
 
 static INLINE void DoSQVHQ(int x) {
+#if SOUND_CONFIG != SOUND_NONE
 	int32 V;
 	int32 amp = ((vpsg1[x << 2] & 15) << 8) * 6 / 8;
 
@@ -262,6 +267,7 @@ static INLINE void DoSQVHQ(int x) {
 		}
 	}
 	cvbc[x] = SOUNDTS;
+#endif
 }
 
 static void DoSQV1HQ(void) {
@@ -273,6 +279,7 @@ static void DoSQV2HQ(void) {
 }
 
 static void DoSawVHQ(void) {
+#if SOUND_CONFIG != SOUND_NONE
 	static uint8 b3 = 0;
 	static int32 phaseacc = 0;
 	int32 V;
@@ -293,6 +300,7 @@ static void DoSawVHQ(void) {
 		}
 	}
 	cvbc[2] = SOUNDTS;
+#endif
 }
 
 

@@ -29,21 +29,7 @@
 //#include "wave.h"
 //#include "debug.h"
 
-static uint32 wlookup1[32];
-static uint32 wlookup2[203];
-
-int32 Wave[2048+512];
-int32 WaveHi[40000];
-int32 WaveFinal[2048+512];
-
 EXPSOUND GameExpSound={0,0,0};
-
-/*static*/ uint8 TriCount=0;
-static uint8 TriMode=0;
-
-static int32 tristep=0;
-
-static int32 wlcount[4]={0,0,0,0};	// Wave length counters.
 
 // APU registers:
 uint8 PSG[0x10];			// $4000-$400F / Channels 1-4
@@ -57,6 +43,26 @@ uint8 IRQFrameMode=0;		// $4017 / Frame counter control / xx000000
 uint8 InitialRawDALatch=0; // used only for lua
 bool DMC_7bit = 0; // used to skip overclocking
 ENVUNIT EnvUnits[3];
+
+uint32 soundtsoffs=0;
+
+/* Variables exclusively for low-quality sound. */
+int32 nesincsize=0;
+uint32 soundtsinc=0;
+uint32 soundtsi=0;
+
+#if SOUND_CONFIG != SOUND_NONE
+
+int32 Wave[2048+512];
+int32 WaveHi[40000];
+int32 WaveFinal[2048+512];
+
+/*static*/ uint8 TriCount=0;
+static uint8 TriMode=0;
+static int32 tristep=0;
+static int32 wlcount[4]={0,0,0,0};	// Wave length counters.
+static uint32 wlookup1[32];
+static uint32 wlookup2[203];
 
 static const int RectDuties[4]={1,2,4,6};
 
@@ -72,12 +78,6 @@ static uint8 fcnt=0;
 static int32 fhcnt=0;
 static int32 fhinc=0;
 
-uint32 soundtsoffs=0;
-
-/* Variables exclusively for low-quality sound. */
-int32 nesincsize=0;
-uint32 soundtsinc=0;
-uint32 soundtsi=0;
 static int32 sqacc[2];
 /* LQ variables segment ends. */
 
@@ -1012,10 +1012,6 @@ void SetNESSoundMap(void)
 static int32 inbuf=0;
 int FlushEmulateSound(void)
 {
-#if SOUND_CONFIG == SOUND_NONE
-  return 0;
-#endif
-
   int x;
   int32 end,left;
 
@@ -1256,6 +1252,12 @@ void SetSoundVariables(void)
   //soundtsinc=(uint32)((uint64)(PAL?(long double)PAL_CPU*65536:(long double)NTSC_CPU*65536)/(FSettings.SndRate * 16));
   soundtsinc=nesincsize / 2;
 }
+#else
+void FCEU_SoundCPUHook(int cycles) {}
+void FCEUSND_Power(void) {}
+int FlushEmulateSound(void) { return 0; }
+void SetSoundVariables(void) {}
+#endif
 
 void FCEUI_Sound(int Rate)
 {
@@ -1305,60 +1307,6 @@ void FCEUI_SetPCMVolume(uint32 volume)
 {
   FSettings.PCMVolume=volume;
 }
-
-SFORMAT FCEUSND_STATEINFO[]={
-
-  { &fhcnt, 4|FCEUSTATE_RLSB,"FHCN"},
-  { &fcnt, 1, "FCNT"},
-  { PSG, 0x10, "PSG"},
-  { &EnabledChannels, 1, "ENCH"},
-  { &IRQFrameMode, 1, "IQFM"},
-  { &nreg, 2|FCEUSTATE_RLSB, "NREG"},
-  { &TriMode, 1, "TRIM"},
-  { &TriCount, 1, "TRIC"},
-
-  { &EnvUnits[0].Speed, 1, "E0SP"},
-  { &EnvUnits[1].Speed, 1, "E1SP"},
-  { &EnvUnits[2].Speed, 1, "E2SP"},
-
-  { &EnvUnits[0].Mode, 1, "E0MO"},
-  { &EnvUnits[1].Mode, 1, "E1MO"},
-  { &EnvUnits[2].Mode, 1, "E2MO"},
-
-  { &EnvUnits[0].DecCountTo1, 1, "E0D1"},
-  { &EnvUnits[1].DecCountTo1, 1, "E1D1"},
-  { &EnvUnits[2].DecCountTo1, 1, "E2D1"},
-
-  { &EnvUnits[0].decvolume, 1, "E0DV"},
-  { &EnvUnits[1].decvolume, 1, "E1DV"},
-  { &EnvUnits[2].decvolume, 1, "E2DV"},
-
-  { &lengthcount[0], 4|FCEUSTATE_RLSB, "LEN0"},
-  { &lengthcount[1], 4|FCEUSTATE_RLSB, "LEN1"},
-  { &lengthcount[2], 4|FCEUSTATE_RLSB, "LEN2"},
-  { &lengthcount[3], 4|FCEUSTATE_RLSB, "LEN3"},
-  { sweepon, 2, "SWEE"},
-  { &curfreq[0], 4|FCEUSTATE_RLSB,"CRF1"},
-  { &curfreq[1], 4|FCEUSTATE_RLSB,"CRF2"},
-  { SweepCount, 2,"SWCT"},
-
-  { &SIRQStat, 1, "SIRQ"},
-
-  { &DMCacc, 4|FCEUSTATE_RLSB, "5ACC"},
-  { &DMCBitCount, 1, "5BIT"},
-  { &DMCAddress, 4|FCEUSTATE_RLSB, "5ADD"},
-  { &DMCSize, 4|FCEUSTATE_RLSB, "5SIZ"},
-  { &DMCShift, 1, "5SHF"},
-
-  { &DMCHaveDMA, 1, "5HVDM"},
-  { &DMCHaveSample, 1, "5HVSP"},
-
-  { &DMCSizeLatch, 1, "5SZL"},
-  { &DMCAddressLatch, 1, "5ADL"},
-  { &DMCFormat, 1, "5FMT"},
-  { &RawDALatch, 1, "RWDA"},
-  { 0 }
-};
 
 #if 0
 void FCEUSND_SaveState(void)

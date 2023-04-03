@@ -142,6 +142,7 @@ static DECLFW(M69SWrite1) {
 }
 
 static void DoAYSQ(int x) {
+#if SOUND_CONFIG != SOUND_NONE
 	int32 freq = ((sreg[x << 1] | ((sreg[(x << 1) + 1] & 15) << 8)) + 1) << (4 + 17);
 	int32 amp = (sreg[0x8 + x] & 15) << 2;
 	int32 start, end;
@@ -164,9 +165,11 @@ static void DoAYSQ(int x) {
 				vcount[x] += freq;
 			}
 		}
+#endif
 }
 
 static void DoAYSQHQ(int x) {
+#if SOUND_CONFIG != SOUND_NONE
 	uint32 V;
 	int32 freq = ((sreg[x << 1] | ((sreg[(x << 1) + 1] & 15) << 8)) + 1) << 4;
 	int32 amp = (sreg[0x8 + x] & 15) << 6;
@@ -185,6 +188,7 @@ static void DoAYSQHQ(int x) {
 		}
 	}
 	CAYBC[x] = SOUNDTS;
+#endif
 }
 
 static void AYSound(int Count) {

@@ -487,7 +487,11 @@ void FCEUI_Emulate(uint8 **pXBuf, int32 **SoundBuf, int32 *SoundBufSize, int ski
 			//memcpy(XBuf, XBackBuf, 256*256);
 			memset(XBuf, 0, 256*256);
 			*pXBuf = XBuf;
+#if SOUND_CONFIG != SOUND_NONE
       *SoundBuf = WaveFinal;
+#else
+      *SoundBuf = 0;
+#endif
       *SoundBufSize = 0;
 			return;
 		}
@@ -508,7 +512,11 @@ void FCEUI_Emulate(uint8 **pXBuf, int32 **SoundBuf, int32 *SoundBufSize, int ski
     *SoundBuf = 0;
     *SoundBufSize = 0;
   } else {
-    *SoundBuf = WaveFinal;
+#if SOUND_CONFIG != SOUND_NONE
+      *SoundBuf = WaveFinal;
+#else
+      *SoundBuf = 0;
+#endif
     *SoundBufSize = ssize;
   }
 

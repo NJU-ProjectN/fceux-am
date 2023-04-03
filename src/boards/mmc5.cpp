@@ -708,6 +708,7 @@ static MMC5APU MMC5Sound;
 
 
 static void Do5PCM() {
+#if SOUND_CONFIG != SOUND_NONE
 	int32 V;
 	int32 start, end;
 
@@ -719,14 +720,17 @@ static void Do5PCM() {
 	if (!(MMC5Sound.rawcontrol & 0x40) && MMC5Sound.raw)
 		for (V = start; V < end; V++)
 			Wave[V >> 4] += MMC5Sound.raw << 1;
+#endif
 }
 
 static void Do5PCMHQ() {
+#if SOUND_CONFIG != SOUND_NONE
 	uint32 V;
 	if (!(MMC5Sound.rawcontrol & 0x40) && MMC5Sound.raw)
 		for (V = MMC5Sound.BC[2]; V < SOUNDTS; V++)
 			WaveHi[V] += MMC5Sound.raw << 5;
 	MMC5Sound.BC[2] = SOUNDTS;
+#endif
 }
 
 
@@ -769,6 +773,7 @@ static DECLFW(Mapper5_SW) {
 }
 
 static void Do5SQ(int P) {
+#if SOUND_CONFIG != SOUND_NONE
 	static int tal[4] = { 1, 2, 4, 6 };
 	int32 V, amp, rthresh, wl;
 	int32 start, end;
@@ -801,9 +806,11 @@ static void Do5SQ(int P) {
 		MMC5Sound.dcount[P] = dc;
 		MMC5Sound.vcount[P] = vc;
 	}
+#endif
 }
 
 static void Do5SQHQ(int P) {
+#if SOUND_CONFIG != SOUND_NONE
 	static int tal[4] = { 1, 2, 4, 6 };
 	uint32 V;
 	int32 amp, rthresh, wl;
@@ -832,6 +839,7 @@ static void Do5SQHQ(int P) {
 		MMC5Sound.vcount[P] = vc;
 	}
 	MMC5Sound.BC[P] = SOUNDTS;
+#endif
 }
 
 void MMC5RunSoundHQ(void) {
