@@ -105,12 +105,11 @@ static void KeyboardCommands ()
 	// get the keyboard input
   int keycode;
   do {
-#define KEYDOWN_MASK 0x8000
     AM_INPUT_KEYBRD_T ev = io_read(AM_INPUT_KEYBRD);
     assert(ev.keycode < 256);
     keycode = ev.keycode;
     g_keyState[keycode] = ev.keydown;
-    if (keycode == AM_KEY_ESCAPE || keycode == AM_KEY_Q) halt(0);
+    if (ev.keydown && (keycode == AM_KEY_ESCAPE || keycode == AM_KEY_Q)) halt(0);
   } while (keycode != AM_KEY_NONE);
 
 	// Toggle throttling
