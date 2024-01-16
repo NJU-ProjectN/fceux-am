@@ -11,7 +11,8 @@ cwd = Path('.')
 for f in cwd.glob('rom/*.nes'):
   name = f.stem
   if not (cwd / 'gen' / f'{name}.c').exists():
-    os.system(f'xxd -i "{f}" > gen/{name}.c')
+    os.system(f'echo "const " > gen/{name}.c')
+    os.system(f'xxd -i "{f}" >> gen/{name}.c')
   roms.append(name)
 
 for f in cwd.glob('gen/*.c'):
@@ -20,12 +21,12 @@ for f in cwd.glob('gen/*.c'):
 
 def h_file():
   for name in roms:
-    yield 'extern unsigned char rom_%s_nes[];' % (name)
+    yield 'extern const unsigned char rom_%s_nes[];' % (name)
     yield 'extern unsigned int rom_%s_nes_len;' % (name)
   yield '''
 struct rom {
   const char *name;
-  void *body;
+  const void *body;
   unsigned int *size;
 };
 
