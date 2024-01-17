@@ -23,12 +23,15 @@
 #if PERF_CONFIG == PERF_HIGH
 # define NR_FRAMESKIP 0
 # define SOUND_CONFIG SOUND_HQ
+# define FUNC_IDX_MAX256
 #elif PERF_CONFIG == PERF_MIDDLE
 # define NR_FRAMESKIP 1
 # define SOUND_CONFIG SOUND_LQ
+# define FUNC_IDX_MAX256
 #else
 # define NR_FRAMESKIP 2
 # define SOUND_CONFIG SOUND_NONE
+# define FUNC_IDX_MAX16
 #endif
 
 #endif

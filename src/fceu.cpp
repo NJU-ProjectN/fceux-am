@@ -118,8 +118,6 @@ void (*GameInterface)(GI h);
 void (*GameStateRestore)(int version);
 
 #ifdef SIZE_OPT
-#define FUNC_IDX_MAX16
-
 #ifdef FUNC_IDX_MAX16
 #define FUNC_IDX_MAX 16
 static uint8 AReadIdx[0x10000 / 2];
