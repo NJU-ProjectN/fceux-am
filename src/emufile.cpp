@@ -29,10 +29,11 @@ THE SOFTWARE.
 void EMUFILE_FILE::open(const char* fname, const char* mode) {
   struct rom *cur = &roms[0];
   int found = 0;
-  for (int i = 1; i < nroms; i++) {
+  for (int i = 0; i < nroms; i++) {
     if (strcmp(roms[i].name, fname) == 0) {
       cur = &roms[i];
       found = 1;
+      break;
     }
   }
 
