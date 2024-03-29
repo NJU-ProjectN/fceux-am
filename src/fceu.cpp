@@ -533,7 +533,9 @@ void FCEUI_CloseGame(void) {
 void ResetNES(void) {
 	if (!GameInfo) return;
 	GameInterface(GI_RESETM2);
+#if SOUND_CONFIG != SOUND_NONE
 	FCEUSND_Reset();
+#endif
 	FCEUPPU_Reset();
 	X6502_Reset();
 
