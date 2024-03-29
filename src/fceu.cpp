@@ -530,6 +530,7 @@ void FCEUI_CloseGame(void) {
 	FCEU_CloseGame();
 }
 
+#if 0
 void ResetNES(void) {
 	if (!GameInfo) return;
 	GameInterface(GI_RESETM2);
@@ -543,6 +544,7 @@ void ResetNES(void) {
 
 	FCEU_DispMessage("Reset");
 }
+#endif
 
 u64 xoroshiro128plus_next() {
 	return 0;
