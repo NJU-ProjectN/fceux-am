@@ -166,10 +166,12 @@ FCEUD_Update(uint8 *XBuf,
 
 		//if(uflow) puts("Underflow");
 		tmpcan = GetWriteSound();
+
+    if(XBuf && (inited&4) && !(NoWaiting & 2))
+      BlitScreen(XBuf);
+
 		// don't underflow when scaling fps
 		if((tmpcan < Count*9/10) && !uflow) {
-			if(XBuf && (inited&4) && !(NoWaiting & 2))
-				BlitScreen(XBuf);
 			Buffer+=can;
 			Count-=can;
 			if(Count) {
