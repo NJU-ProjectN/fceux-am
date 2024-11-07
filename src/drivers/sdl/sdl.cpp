@@ -151,6 +151,7 @@ FCEUD_Update(uint8 *XBuf,
 			 int Count)
 {
 	int ocount = Count;
+	int blitDone = 0;
 	if(Count) {
 		int32 can=GetWriteSound();
 		static int uflow=0;
@@ -166,10 +167,12 @@ FCEUD_Update(uint8 *XBuf,
 
 		//if(uflow) puts("Underflow");
 		tmpcan = GetWriteSound();
+
 		// don't underflow when scaling fps
 		if((tmpcan < Count*9/10) && !uflow) {
-			if(XBuf && (inited&4) && !(NoWaiting & 2))
-				BlitScreen(XBuf);
+			if(XBuf && (inited&4) && !(NoWaiting & 2)) {
+				BlitScreen(XBuf); blitDone = 1;
+			}
 			Buffer+=can;
 			Count-=can;
 			if(Count) {
@@ -201,6 +204,11 @@ FCEUD_Update(uint8 *XBuf,
 		if(!NoWaiting && (!(eoptions&EO_NOTHROTTLE) || FCEUI_EmulationPaused())) {
       while (SpeedThrottle()) { FCEUD_UpdateInput(); }
     }
+		if(XBuf && (inited&4)) {
+			BlitScreen(XBuf); blitDone = 1;
+		}
+	}
+	if (!blitDone) {
 		if(XBuf && (inited&4)) {
 			BlitScreen(XBuf);
 		}
