@@ -841,14 +841,6 @@ int iNESLoad(const char *name, FCEUFILE *fp, int OverwriteVidMode) {
 
 	SetInput();
 	CheckHInfo();
-	{
-		int x;
-		uint64 partialmd5 = 0;
-
-		for (x = 0; x < 8; x++) {
-			partialmd5 |= (uint64)iNESCart.MD5[7 - x] << (x * 8);
-		}
-	}
 	/* Must remain here because above functions might change value of
 	VROM_size and free(VROM).
 	*/

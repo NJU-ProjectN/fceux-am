@@ -95,7 +95,7 @@ extern int dendy;
 
 //#include "driver.h"
 
-typedef struct {
+typedef struct FCEUS {
 	int PAL;
 	int NetworkPlay;
 	int SoundVolume;		//Master volume
